@@ -31,7 +31,7 @@
         <option value="Yorkshire">Yorkshire</option>
         <option value="Richmond">Richmond</option>
       </select>
-      Only routes: <input type="checkbox" checked onchange="onlyRoutes(this)">
+      Only routes: <input id="onlyRouteCheckBox" type="checkbox" onchange="onlyRoutes(this)">
       Imperial: <input id="imperialCheckBox" type="checkbox" onchange="imperial(this)">
     </div>
     <hr>
@@ -49,7 +49,6 @@
   <script>
 
     var guestWorld = "-1";
-    var showOnlyRoutes = true;
 
     var data = [
 
@@ -229,7 +228,7 @@
       updatePage()
     }
     function onlyRoutes(bool) {
-      showOnlyRoutes = bool.checked;
+      localStorage.setItem("showOnlyRoutes",bool.checked);
       updatePage()
     }
     function imperial(bool) {
@@ -264,10 +263,15 @@
 
 
     function genDivs(element,data,completed) {
+      var showOnlyRoutes =localStorage.getItem("showOnlyRoutes")==="true";
       var totalAchievements = 0;
       var completedAchivements= 0;
       data.forEach((d,i) => {
-        totalAchievements++;
+        if(showOnlyRoutes && d["type"] !== "Route"){
+            //if its not a route , and your only showing routes.  dont count it as total
+        }else{
+          totalAchievements++;
+        }
         let show = false
         if (completed) {
           
@@ -291,6 +295,7 @@
 
 
         if (show) {
+          
           var row = document.createElement("div");
           row.className = "slot"; //slot css not made yet
           var onClickFunction = "remove";
@@ -329,6 +334,7 @@
         sumBody.innerHTML=completedAchivements+"/"+totalAchievements
       }
       document.getElementById("imperialCheckBox").checked = localStorage.getItem("imperial")==="true";
+      document.getElementById("onlyRouteCheckBox").checked = localStorage.getItem("showOnlyRoutes")==="true";
     }
 
   </script>
