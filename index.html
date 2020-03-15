@@ -1,24 +1,339 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>Hello World</title>
+  <title>Zwift Achievements</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <link rel="apple-touch-icon" href="images/hello-icon-152.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="white"/>
+  <meta name="theme-color" content="white" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Hello World">
+  <meta name="apple-mobile-web-app-title" content="Zwift Achievements">
   <meta name="msapplication-TileImage" content="images/hello-icon-144.png">
   <meta name="msapplication-TileColor" content="#FFFFFF">
 </head>
+
 <body class="fullscreen">
   <div class="container">
-    <h1 class="title">Hello World!</h1>
+    <div class="title">Zwift Achievements</div>
+    <div><span id="sum">?/?</span>
+      World:
+      <select name="guestWorld" onchange="selectWorld(this);">
+        <option value="-1">All</option>
+        <option value="Watopia">Watopia</option>
+        <option value="New York">New York</option>
+        <option value="London">London</option>
+        <option value="Innsbruck">Innsbruck</option>
+        <option value="Yorkshire">Yorkshire</option>
+        <option value="Richmond">Richmond</option>
+      </select>
+      Only routes: <input type="checkbox" checked onchange="onlyRoutes(this)">
+      Imperial: <input id="imperialCheckBox" type="checkbox" onchange="imperial(this)">
+    </div>
+    <hr>
+    <div><b>Available achievements</b></div>
+    <div id="available" class="wrapper"></div>
+
+    <hr>
+    <div><b>Completed achievements</b></div>
+    <div id="taken" class="wrapper"></div>
   </div>
+
+
+
   <script src="js/main.js"></script>
+  <script>
+
+    var guestWorld = "-1";
+    var showOnlyRoutes = true;
+
+    var data = [
+
+
+      //General Achievements
+      {"name": "Habitual",        "task": "Ride a lap 3 days in a row",             "world": "N/A",         "type": "other",  "image": "Ride3days",       "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Addicted",        "task": "Ride a lap 7 days in a row",             "world": "N/A",         "type": "other",  "image": "7DaysRide",       "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Unemployed",      "task": "Ride a lap 14 days in a row",            "world": "N/A",         "type": "other",  "image": "Ride14days",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Youre Popular",   "task": "Get 10 ride ons in one ride",            "world": "N/A",         "type": "other",  "image": "GetRideOn1",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Ride On",         "task": "Give 3 Ride Ons",                        "world": "N/A",         "type": "other",  "image": "GiveRideOn1",     "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Big Fan",         "task": "Give 30 Ride Ons",                       "world": "N/A",         "type": "other",  "image": "GiveRideOn2",     "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Fan Club",        "task": "Give 100 Ride Ons",                      "world": "N/A",         "type": "other",  "image": "GiveRideOn3",     "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Paparazzi",       "task": "Fan view for 15 minutes",                "world": "N/A",         "type": "other",  "image": "Fanview",         "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Into the Wind",   "task": "Did a u-turn",                           "world": "N/A",         "type": "other",  "image": "Uturn",           "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Statistician",    "task": "Connected your Strava account",          "world": "N/A",         "type": "other",  "image": "ConnectToStrava", "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Paired",          "task": "Paired a phone through Zwift Companion", "world": "N/A",         "type": "other",  "image": "PairZwift",       "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Sweat!",          "task": "Completed a workout",                    "world": "N/A",         "type": "other",  "image": "CompleteWorkout", "km": "NA", "miles": "NA",  "xp": "xxx",},
+      //Cycling Achievements
+
+      {"name": "Cant Stop Now",      "task": "Ride 10 miles in 1 activity",              "world": "N/A",         "type": "other",  "image": "Distance10",    "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Marathoner",          "task": "Ride 40km",                                "world": "N/A",         "type": "other",  "image": "Distance40km",  "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "100 Clicks",          "task": "Ride 100km",                               "world": "N/A",         "type": "other",  "image": "Distance100km", "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "No Big Deal",         "task": "Ride 100 miles",                           "world": "N/A",         "type": "other",  "image": "Distance100mi", "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Whoa Nelly",          "task": "You broke 30mph!",                         "world": "N/A",         "type": "other",  "image": "30mphTrike",    "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Speed Demon",         "task": "You broke 40mph!",                         "world": "N/A",         "type": "other",  "image": "40mphBike",     "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Daredevil",           "task": "Break 50 mph",                             "world": "N/A",         "type": "other",  "image": "50mphRocket",   "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Sprinter Apprentice", "task": "Hit 500 watts",                            "world": "N/A",         "type": "other",  "image": "Watt1",         "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Lit",                 "task": "Hit 600 watts",                            "world": "N/A",         "type": "other",  "image": "Watt2",         "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Circuit Breaker",     "task": "Hit 700 watts",                            "world": "N/A",         "type": "other",  "image": "Watt3",         "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Master Draftsman",    "task": "Draft with another rider for 15 seconds",  "world": "N/A",         "type": "other",  "image": "Drafting",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Jelly",               "task": "Hold over 500 watts for 10 seconds",       "world": "N/A",         "type": "other",  "image": "500w10sec",     "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Warmed Up",           "task": "Do 5 Volcano Circuit laps in 1 activity",  "world": "N/A",         "type": "other",  "image": "VolcanoLap01",  "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Hothead",             "task": "Do 10 Volcano Circuit laps in 1 activity", "world": "N/A",         "type": "other",  "image": "VolcanoLap02",  "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "On Fire!",            "task": "Do 25 Volcano Circuit laps in 1 activity", "world": "N/A",         "type": "other",  "image": "VolcanoLap03",  "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Avid Climber",        "task": "Climb the Alpe 5 times",                   "world": "N/A",         "type": "other",  "image": "ClimbAlpe5x",   "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Masochist",           "task": "Climb the Alpe 25 times",                  "world": "N/A",         "type": "other",  "image": "ClimbAlpe25x",  "km": "NA", "miles": "NA",  "xp": "1000xp",},
+      
+
+      //Routes
+
+      //Watopia
+      {"name": "HILLY ROUTE",                 "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "9.1km 100m",    "miles": "5.7miles 329'",     "xp": "180",},
+      {"name": "SAND AND SEQUOIAS",           "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "20.2km 147m",   "miles": "12.6miles 482'",    "xp": "400",},
+      {"name": "VOLCANO CIRCUIT",             "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "4km 17m",       "miles": "2.6miles 56'",      "xp": "80",},
+      {"name": "VOLCANO CLIMB",               "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "22.8km 192m",   "miles": "14.2miles 630'",    "xp": "460",},
+      {"name": "THREE SISTERS",               "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "47.8km 879m",   "miles": "29.7miles 2883'",   "xp": "950",},
+      {"name": "THE PRETZEL",                 "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "72.2km 1333m",  "miles": "44.9miles 4375'",   "xp": "1440",},
+      {"name": "JUNGLE CIRCUIT",              "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "7.9km 79m",     "miles": "4.9miles 259'",     "xp": "260",},
+      {"name": "ROAD TO SKY",                 "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "17.3km 1045m",  "miles": "10.7miles 3428'",   "xp": "380",},
+      {"name": "FOUR HORSEMEN",               "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "89.3km 2112m",  "miles": "55.5miles 6929'",   "xp": "1780",},
+      {"name": "TOUR OF FIRE AND ICE",        "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "25km 1161m",    "miles": "15.6miles 3812'",   "xp": "500",},
+      {"name": "BIG LOOP",                    "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "42.4km 651m",   "miles": "26.6miles 2175'",   "xp": "840",},
+      {"name": "MOUNTAIN ROUTE",              "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "29.5km 671m",   "miles": "18.3miles 2201'",   "xp": "580",},
+      {"name": "MOUNTAIN 8",                  "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "32km 677m",     "miles": "19.9miles 2221'",   "xp": "640",},
+      {"name": "FIGURE 8",                    "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "29.8km 234m",   "miles": "18.4miles 770'",    "xp": "580",},
+      {"name": "FIGURE 8 REVERSE",            "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "29.8km 234m",   "miles": "18.4miles 770'",    "xp": "580",},
+      {"name": "FLAT ROUTE",                  "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "10.3km 54m",    "miles": "6.4miles 177'",     "xp": "200",},
+      {"name": "ROAD TO RUINS",               "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "29.6km 268m",   "miles": "18.4miles 905'",    "xp": "580",},
+      {"name": "THE MEGA PRETZEL",            "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "107km 1642m",   "miles": "66.5miles 5387'",   "xp": "2140",},
+      {"name": "VOLCANO CIRCUIT CCW",         "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "4.1km 17m",     "miles": "2.6miles 56'",      "xp": "80",},
+      {"name": "VOLCANO FLAT",                "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "12.3km 46m",    "miles": "7.7miles 151'",     "xp": "240",},
+      {"name": "OUT AND BACK AGAIN",          "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "39.8km 303m",   "miles": "24.8miles 997'",    "xp": "840",},
+      {"name": "TEMPUS FUGIT",                "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "17.3km 16m",    "miles": "10.7miles 52'",     "xp": "380",},
+      {"name": "THE UBER PRETZEL",            "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "128.3km 2335m", "miles": "79.7miles 7661'",   "xp": "2560",},
+      {"name": "BIGGER LOOP",                 "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "53.1km 678m",   "miles": "33miles 2225'",     "xp": "1060",},
+      {"name": "TICK TOCK",                   "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "16.8km 44m",    "miles": "10.5miles 146'",    "xp": "380",},
+      {"name": "WHOLE LOTTA LAVA",            "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "12.3km 153m",   "miles": "7.63miles 503'",    "xp": "240",},
+      {"name": "MUIR AND THE MOUNTAIN",       "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "33.9km 767m",   "miles": "21miles 2516'",     "xp": "680",},
+      {"name": "BIG FOOT HILLS",              "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "67.5km 637m",   "miles": "41.9miles 2090'",   "xp": "1340",},
+      {"name": "DUST IN THE WIND",            "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "54.6km 529m",   "miles": "33.9miles 1736'",   "xp": "1080",},
+      {"name": "QUATCH QUEST",                "task": "Complete the route", "world": "Watopia", "type": "Route", "image": "RouteComplete", "km": "45.9km 1683m",  "miles": "28.5 5521'",        "xp": "920",},
+      
+
+      
+           //london
+      {"name": "LONDON LOOP",                 "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "14.9km 220m",  "miles": "9.2miles 722'",  "xp": "300",},
+      {"name": "GREATER LONDON FLAT",         "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "11.6km 45m",   "miles": "7.2miles 149'",  "xp": "230",},
+      {"name": "LONDON CLASSIQUE",            "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "5.4km 19m",    "miles": "3.3miles 62'",   "xp": "110",},
+      {"name": "LONDON 8",                    "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "20.3km 238m",  "miles": "12.6miles 780'", "xp": "410",},
+      {"name": "SURREY HILLS",                "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "44.1km 1029m", "miles": "27.4miles 3377'","xp": "820",},
+            
+      {"name": "GREATER LONDON 8",            "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "	23.8km 256m", "miles": "14.8miles 840'",    "xp": "480",},
+      {"name": "THE LONDON PRETZEL",          "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "55.6km 531m",  "miles": "34.5miles 1742'",   "xp": "1100",},
+      {"name": "THE PRL HALF",                "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "69km 954m",    "miles": "42.8miles 3.130'",  "xp": "1380",},
+      {"name": "GREATEST LONDON FLAT",        "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "23.6km 147m",  "miles": "14.6miles 484'",    "xp": "500",},
+      {"name": "THE PRL FULL",                "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "173km 2496m",  "miles": "107.5miles 8189'",  "xp": "3460",},
+      {"name": "GREATER LONDON LOOP",         "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "21km 244m",    "miles": "13miles 800'",      "xp": "420",},
+      {"name": "GREATEST LONDON LOOP",        "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "25.6km 345m",  "miles": "15.9miles 1132'",   "xp": "510",},
+      {"name": "TRIPLE LOOPS",                "task": "Complete the route", "world": "London", "type": "Route", "image": "RouteComplete", "km": "40.8km 544m",  "miles": "25.4miles 1785'",   "xp": "810",},
+     
+             //Richmond
+      {"name": "COBBLED CLIMBS",              "task": "Complete the route", "world": "Richmond", "type": "Route", "image": "RouteComplete", "km": "9.2km 126m",   "miles": "5.7miles 413'",   "xp": "180",},
+      {"name": "THE FAN FLATS",               "task": "Complete the route", "world": "Richmond", "type": "Route", "image": "RouteComplete", "km": "5km 13m",      "miles": "3.1miles 43'",    "xp": "100",},
+      {"name": "2015 UCI WORLDS COURSE",      "task": "Complete the route", "world": "Richmond", "type": "Route", "image": "RouteComplete", "km": "16.3km 142m",  "miles": "10.1miles 467'",  "xp": "320",},
+      
+          //New York
+      {"name": "KNICKERBOCKER",               "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "22.5km 346m",  "miles": "14miles 1136'",     "xp": "450",},
+      {"name": "ASTORIA LINE 8",              "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "11.5km 129m",  "miles": "7.2miles 425'",     "xp": "230",},
+      {"name": "EVERYTHING BAGEL",            "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "34.2km 525m",  "miles": "21.3miles 1722'",   "xp": "690",},
+      {"name": "PARK PERIMETER LOOP",         "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "9.7km 120m",   "miles": "6.1miles 393'",     "xp": "190",},
+      {"name": "GRAND CENTRAL CIRCUIT",       "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "6.8km 137m",   "miles": "4.2miles 452'",     "xp": "140",},
+      {"name": "KNICKERBOCKER REVERSE",       "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "22.5km 346m",  "miles": "14miles 1136'",     "xp": "450",},
+      {"name": "LADY LIBERTY",                "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "12.3km 197m",  "miles": "7.7miles 648'",     "xp": "240",},
+      {"name": "MIGHTY METROPOLITAN",         "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "20.0km 307m",  "miles": "12.5miles 1008'",   "xp": "400",},
+      {"name": "RISING EMPIRE",               "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "20.7km 362m",  "miles": "12.9miles 1189'",   "xp": "410",},
+      {"name": "THE 6 TRAIN",                 "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "6,4km 61m",    "miles": "4miles 203'",       "xp": "130",},
+      {"name": "THE HIGHLINE",                "task": "Complete the route", "world": "New York", "type": "Route", "image": "RouteComplete", "km": "10.5km 175m",  "miles": "6.5miles 576'",     "xp": "210",},
+
+          //Innsbruck 
+      {"name": "ACHTERBAHN",                  "task": "Complete the route", "world": "Innsbruck", "type": "Route", "image": "RouteComplete", "km": "47.38km 973m",  "miles": "29.4miles 3194'",   "xp": "950",},
+      {"name": "INNSBRUCKRING",               "task": "Complete the route", "world": "Innsbruck", "type": "Route", "image": "RouteComplete", "km": "8.8km 72m",     "miles": "5.5miles 237'",     "xp": "170",},
+      {"name": "2018 UCI WORLDS SHORT LAP	",  "task": "Complete the route", "world": "Innsbruck", "type": "Route", "image": "RouteComplete", "km": "23.6km 487m",   "miles": "14.7miles 1598'",   "xp": "470",},
+      {"name": "LUTSCHER",                    "task": "Complete the route", "world": "Innsbruck", "type": "Route", "image": "RouteComplete", "km": "24.2km 823m",   "miles": "15.1miles 2703'",   "xp": "270",},
+      {"name": "LUTSCHER CCW",                "task": "Complete the route", "world": "Innsbruck", "type": "Route", "image": "RouteComplete", "km": "22.3km 821m",   "miles": "13.9miles 2696'",   "xp": "xxx",},
+      
+ 
+        //Yorkshire
+      {"name": "2019 UCI WORLDS HARROGATE CIRCUIT", "task": "Complete the route", "world": "Yorkshire", "type": "Route", "image": "RouteComplete", "km": "13.8km 240m", "miles": "8.6miles 787'",  "xp": "270",},
+      {"name": "ROYAL PUMP ROOM 8",                 "task": "Complete the route", "world": "Yorkshire", "type": "Route", "image": "RouteComplete", "km": "27.2km 480m", "miles": "16.9miles 1574'","xp": "550",},
+      {"name": "QUEENS HIGHWAY",                   "task": "Complete the route", "world": "Yorkshire", "type": "Route", "image": "RouteComplete", "km": "3km 37m",     "miles": "1.9miles 121'",  "xp": "60",},
+      {"name": "DUCHY ESTATE",                      "task": "Complete the route", "world": "Yorkshire", "type": "Route", "image": "RouteComplete", "km": "3km 37m",     "miles": "1.9miles 121'",  "xp": "60",},
+      {"name": "TOUR OF TEWIT WELL",                "task": "Complete the route", "world": "Yorkshire", "type": "Route", "image": "RouteComplete", "km": "10.4km 200m", "miles": "6.5miles 655'",  "xp": "210",},
+    
+
+        
+     
+     
+     
+      //running routes
+     /* {"name": "May Field", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "COUCH TO SKY K", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "FLAT IRONS", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "HUDSON ROLL", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "PARK TO PEAK", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "SHUMAN TRAIL LOOP", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "5K LOOP", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "11.1 OCEAN BLVD", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "JONS ROUTE", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "THATS AMORE", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+      {"name": "CHILI PEPPER", "task": "Complete the route", "world": "xxxxxxxxxxxx", "type": "Route", "image": "RouteComplete", "km": "kmkmkmkmkmkmkm", "miles": "miiiiiiiiiiiiii'",  "xp": "xxx",},
+     */
+      
+      
+      
+      //Extra credit
+      {"name": "100 KPH",             "task": "Ride at 100 kph (62.1 mph)",               "world": "N/A",         "type": "other",  "image": "100kph",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Just Scrape It",      "task": "Hit 800 watts",                            "world": "N/A",         "type": "other",  "image": "Watt4",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "The Blowdrier",       "task": "Hit 900 watts",                            "world": "N/A",         "type": "other",  "image": "Watt5",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Premier Power",       "task": "Hit 1000 watts",                           "world": "N/A",         "type": "other",  "image": "Watt6",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Off the Rocks",       "task": "Hit 1100 watts",                           "world": "N/A",         "type": "other",  "image": "Watt7",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "1.21 Gigawatts",      "task": "Hit 1200 watts",                           "world": "N/A",         "type": "other",  "image": "Watt8",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Youre Famous",       "task": "Receive 30 Ride Ons in 1 activity",       "world": "N/A",         "type": "other",  "image": "GetRideOn2",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Bigger Than Jensie",  "task": "Receive 100 Ride Ons in 1 activity",       "world": "N/A",         "type": "other",  "image": "GetRideOn3",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Everested!",          "task": "Climb 29,029 feet in 1 activity",          "world": "N/A",         "type": "other",  "image": "EverestChallenge",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+      {"name": "Lift Off",            "task": "Climb the Alpe in under an hour",          "world": "N/A",         "type": "other",  "image": "ClimbAlpe1hour",      "km": "NA", "miles": "NA",  "xp": "xxx",},
+   
+
+      //Running Achivements
+        //They dont need this app
+      
+
+      //Mission
+
+      //Training plans
+
+    ];
+
+
+
+
+    var availableBody = document.querySelector("#available")
+    var takenBody = document.querySelector("#taken");
+
+
+    function selectWorld(world) {
+      guestWorld = world.value;
+      updatePage()
+    }
+    function onlyRoutes(bool) {
+      showOnlyRoutes = bool.checked;
+      updatePage()
+    }
+    function imperial(bool) {
+      localStorage.setItem("imperial",bool.checked);
+      updatePage()
+    }
+
+    function remove(id) {
+      localStorage.setItem(id,true);
+
+      updatePage()
+    }
+
+    function restore(id) {
+      localStorage.setItem(id,false);
+      updatePage()
+    }
+
+
+
+
+    function updatePage() {
+
+      available.innerHTML = "";
+      takenBody.innerHTML = "";
+      genDivs(availableBody,data,false)
+      genDivs(takenBody,data,true)
+    }
+    updatePage()
+
+
+
+
+    function genDivs(element,data,completed) {
+      var totalAchievements = 0;
+      var completedAchivements= 0;
+      data.forEach((d,i) => {
+        totalAchievements++;
+        let show = false
+        if (completed) {
+          
+          if (localStorage.getItem(d["name"]) === "true") {
+            show = true
+          }
+        } else {
+          if (localStorage.getItem(d["name"]) === "false") {
+            show = true
+          }
+          if (!localStorage.getItem(d["name"])) {
+            show = true
+          }
+        }
+
+        if (showOnlyRoutes) {
+          if (d["type"] !== "Route") {
+            show = false
+          }
+        }
+
+
+        if (show) {
+          var row = document.createElement("div");
+          row.className = "slot"; //slot css not made yet
+          var onClickFunction = "remove";
+          if (completed) {
+            onClickFunction = "restore"
+            completedAchivements++
+          }
+          var text = "";
+          if (d["type"] !== "Route") {
+            text = d["task"];
+          } else {
+            if(localStorage.getItem("imperial") === "true"){
+            text = d["miles"];
+            }else{
+            text = d["km"];
+            }
+          }
+
+          row.innerHTML = "<div><img height='\"'90\" width=\"90\" onClick=\"" + onClickFunction + "('" + d["name"] + "')\" src=\"images/" + d["image"] + ".png\"></div><div><b>" + d["name"] + "</b></div><div>" + text + "</div>" // Assign object values to cells   
+
+          if (completed) {
+            element.appendChild(row);
+
+          }
+          else {
+            if (guestWorld == d["world"] || guestWorld === "-1" || (d["world"] == "N/A" && !showOnlyRoutes)) {
+              element.appendChild(row);
+            }
+          }
+        }
+      })
+
+      if(completed){
+        //only show sum if you are rendering completed list
+        var sumBody = document.querySelector("#sum");
+        sumBody.innerHTML=completedAchivements+"/"+totalAchievements
+      }
+      document.getElementById("imperialCheckBox").checked = localStorage.getItem("imperial")==="true";
+    }
+
+  </script>
+
+
 </body>
+
 </html>

@@ -5,7 +5,7 @@ body {
 /* Make content area fill the entire browser window */
 html,
 .fullscreen {
-  display: flex;
+  /*display: flex;*/
   height: 100%;
   margin: 0;
   padding: 0;
@@ -19,5 +19,21 @@ html,
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2rem;
+}
+
+.wrapper {
+  display: grid;
+  grid-gap: 0px;
+  grid-template-columns: repeat(auto-fill, minmax(100px,1fr));
+  margin-bottom: 2em;
+}
+.slot {
+  padding: 0px;
+  font-size: 80%;
+}
+
+.box:nth-child(even) {
+  background-color: #ccc;
+  color: #000;
 }

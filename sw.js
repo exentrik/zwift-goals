@@ -1,4 +1,4 @@
-var cacheName = 'hello-pwa';
+var cacheName = 'zwift-Achievements';
 var filesToCache = [
   '/',
   '/index.html',
